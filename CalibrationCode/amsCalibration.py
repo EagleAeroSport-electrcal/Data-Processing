@@ -1,7 +1,21 @@
-#TODO Look into necessary variable types using numpy
+"""Calculate useable temperature and pressure values from the AMS5915."""
+
+# Disable alert about improper case of variable. I prefer camelcase
+# pylint: disable-msg=C0103
+
+# pylint gets confused about indentation, just disable the warning.
+# pylint: disable-msg=C0330
+
+
+# TODO Look into necessary variable types using numpy
+
 
 def calibrateTemp(rawTemp):
+    """Get calibrated temperature from raw temp."""
     return ((rawTemp * 200) / 2048) - 50
 
-def calibratePressure(rawPressure, digiOutPMin, sensp, pMin):
-    return ((rawPressure - digiOutPMin) / ((digiOutPMax - digiOutPMin)/(pMin - pMax))) + pMin
+
+def calibratePressure(rawPressure, digiOutPMin, digiOutPMax, pMin, pMax):
+    """Get calibrated pressure from raw pressure."""
+    sensep = (digiOutPMax - digiOutPMin) / (pMax - pMin)
+    return ((rawPressure - digiOutPMin) / (sensep)) + pMin
