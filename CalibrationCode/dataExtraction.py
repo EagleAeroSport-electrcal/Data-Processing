@@ -13,7 +13,16 @@ or graphing).
 # pylint gets confused about indentation, just disable the warning.
 # pylint: disable-msg=C0330
 
-f = open('easRV12_28_Oct_2016_04_39_20.log', 'rb')
+
+# Nesting in try blocks to see if the code is being run from a system with top
+# level as github repo
+
+
+try:
+    f = open('easRV12_28_Oct_2016_04_39_20.log', 'rb')
+except FileNotFoundError:
+    f = open('CalibrationCode\easRV12_28_Oct_2016_04_39_20.log', 'rb')
+
 
 # Each DAQpack is 24 bytes long
 
@@ -58,7 +67,7 @@ def coefS8(string, points):
     return result
 
 
-for i in enumerate(header):
+for i, value in enumerate(header):
     header[i] = header[i].splitlines()
     header[i][:] = [item for item in header[i] if item]
 
@@ -68,24 +77,25 @@ for i in enumerate(header):
         del header[i]
 
     elif "BME280 Temperature Humidity Pressure Sensor" in header[i][1]:
+        sensorID = int(header[i][0].split(': ')[1])
         # This part is just for debugging at the moment. It lists BME280s
         # print("Found a pressure sensor at index " + str(i))
 
         # Initialize a new entry in the dictionary of calibrations.
-        presCalibrations[header[i][0].split(': ')[1]] = {}
+        presCalibrations[sensorID] = {}
 
         # Parse the calibration line to be only the characters that we want
         calString = (header[i][5].split('||')[1])
 
         # Calculate the temperature calibration values
-        presCalibrations[header[i][0].split(': ')[1]]['temperature'] = [
+        presCalibrations[sensorID]['temperature'] = [
             coefU(calString, [2, 3, 0, 1]),
             coefS16(calString, [6, 7, 4, 5]),
             coefS16(calString, [10, 11, 8, 9])
         ]
 
         # Calculate the Pressure calibration values
-        presCalibrations[header[i][0].split(': ')[1]]['pressure'] = [
+        presCalibrations[sensorID]['pressure'] = [
             coefU(calString, [14, 15, 12, 13]),
             coefS16(calString, [18, 19, 16, 17]),
             coefS16(calString, [22, 23, 20, 21]),
@@ -98,7 +108,7 @@ for i in enumerate(header):
         ]
 
         # Calculate the humidity calibrations values
-        presCalibrations[header[i][0].split(': ')[1]]['humidity'] = [
+        presCalibrations[sensorID]['humidity'] = [
             coefU(calString, [48, 49]),
             coefS16(calString, [52, 53, 50, 51]),
             coefU(calString, [54, 55]),
@@ -123,7 +133,7 @@ for i in range(0, int(len(rawData) / 24)):
 
 # Split the information in each packet into the proper type
 uCompData = [{}] * len(splitData)
-for i in enumerate(splitData):
+for i, val in enumerate(splitData):
     packetType = int.from_bytes(splitData[i][4:8], byteorder='little')
     if packetType == 0:
         # Undef, What is this
@@ -204,17 +214,20 @@ for i in enumerate(splitData):
     elif packetType == 0x0b:
         # HSCpress packet. Used by our relative pressure sensors (pitot tubes)
 
+        # Currently has some issues with the status bit, waiting on Dr. Davis
+        # For a solution
+
         uCompData[i] = {'ID': splitData[i][0],
                         'type': packetType,
-                        # This appears to be mesconfigured on the C++ code.
-                        # There is not
-                        # A status bit, and 4 bits of data are sent, not 6.
+                        # 'status': int.from_bytes(bytessplitData[i][])
+                        # 'uPres': int.
                         }
     elif packetType == 0x0c:
         # DUAL_Clock_t unknown use
         pass
     elif packetType == 0x0d:
         pass
+
 
 # Packet Format is 1 byte ID for sensor, then a 4 byte ID for the packet type
 # The rest of the bytes (19 of them) hold the data. The format for this changes
