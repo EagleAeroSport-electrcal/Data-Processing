@@ -37,6 +37,7 @@ rawData = data[0x400:]
 
 splitData = []
 brokenDown = []
+compHumid = []
 
 # Convert header to string
 header = header.decode("utf-8")
@@ -178,19 +179,19 @@ for i, val in enumerate(splitData):
                                              byteorder='little'),
                         'type': packetType,
                         'uAccX': int.from_bytes(splitData[i][8:10],
-                                                byteorder='big'),
+                                                byteorder='little'),
                         'uAccY': int.from_bytes(splitData[i][10:12],
-                                                byteorder='big'),
+                                                byteorder='little'),
                         'uAcczZ': int.from_bytes(splitData[i][12:14],
-                                                 byteorder='big'),
+                                                 byteorder='little'),
                         'uGyroX': int.from_bytes(splitData[i][14:16],
-                                                 byteorder='big'),
+                                                 byteorder='little'),
                         'uGyroY': int.from_bytes(splitData[i][16:18],
-                                                 byteorder='big'),
+                                                 byteorder='little'),
                         'uGyroZ': int.from_bytes(splitData[i][18:20],
-                                                 byteorder='big'),
+                                                 byteorder='little'),
                         'uTemp': int.from_bytes(splitData[i][20:22],
-                                                byteorder='big'),
+                                                byteorder='little'),
                         }
     elif packetType == 0x08:
         # ADXL345_t currently unused in code (commit 182fe0c)
@@ -204,11 +205,11 @@ for i, val in enumerate(splitData):
                                              byteorder='little'),
                         'type': packetType,
                         'uPres': int.from_bytes(splitData[i][8:12],
-                                                byteorder='big'),
+                                                byteorder='little'),
                         'uTemp': int.from_bytes(splitData[i][12:16],
-                                                byteorder='big'),
+                                                byteorder='little'),
                         'uHumid': int.from_bytes(splitData[i][16:18],
-                                                 byteorder='big')
+                                                 byteorder='little')
                         }
 
     elif packetType == 0x0b:
@@ -235,5 +236,9 @@ for i, val in enumerate(splitData):
 
 # print(item for item in uCompData if (item['ID'] == 2))
 
-# for item in uCompData if item['ID'] == 2:
-#   print('hello')
+for item in range(0,20):
+    try:
+        if uCompData[item]['ID'] == 2:
+            print(uCompData[item])
+    except:
+        pass
