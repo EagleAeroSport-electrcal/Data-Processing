@@ -236,7 +236,11 @@ for i, val in enumerate(splitData):
 
 # print(item for item in uCompData if (item['ID'] == 2))
 
+<<<<<<< HEAD
 for item in range(0, 20):
+=======
+for item in range(0,20):
+>>>>>>> 9c855d952a7b638bdf7da552994902f04eb77e5f
     try:
         if uCompData[item]['ID'] == 2:
             print(uCompData[item])
