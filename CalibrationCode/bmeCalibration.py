@@ -108,6 +108,6 @@ try:
         return humidity
 
 
-# For future use in logging errors, Currently just raises the error as standard
+# For future use in logging errors, Currently just raises the error as default
 except ModuleNotFoundError as error:
     raise
