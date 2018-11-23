@@ -2,7 +2,7 @@
 This is the top level file for the EAS Data extraction module.
 
 It reads the calibration coefficents and the raw data from the EAS Log files,
-organizes the, and calculates SI values for each raw data point, saving it as
+organizes them, and calculates SI values for each raw data point, saving it as
 in a form for other scripts to acces and operate on (such as saving to a file,
 or graphing).
 """
@@ -19,9 +19,9 @@ or graphing).
 
 
 try:
-    f = open('easRV12_28_Oct_2016_04_39_20.log', 'rb')
+    f = open('easRV12_15_Nov_2018_21_15_33.log', 'rb')
 except FileNotFoundError:
-    f = open('CalibrationCode\easRV12_28_Oct_2016_04_39_20.log', 'rb')
+    f = open('CalibrationCode\easRV12_15_Nov_2018_21_15_33.log', 'rb')
 
 
 # Each DAQpack is 24 bytes long
@@ -43,7 +43,6 @@ compHumid = []
 header = header.decode("utf-8")
 
 header = header.split('-----')
-
 presCalibrations = {}
 
 
@@ -61,7 +60,7 @@ def coefU(string, points):
 
 
 def coefS8(string, points):
-    """Get a signed 8-bit valie from the provided string."""
+    """Get a signed 8-bit value from the provided string."""
     result = coefU(string, points)
     if result > 127:
         result -= 256
@@ -137,7 +136,8 @@ uCompData = [{}] * len(splitData)
 for i, val in enumerate(splitData):
     packetType = int.from_bytes(splitData[i][4:8], byteorder='little')
     if packetType == 0:
-        # Undef, What is this
+        # Undef, Means something weird happened and we need to check CPP
+        # code for errors
         pass
     elif packetType == 0x01:
         pass
