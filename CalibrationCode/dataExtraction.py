@@ -21,7 +21,7 @@ or graphing).
 try:
     f = open('easRV12_15_Nov_2018_21_15_33.log', 'rb')
 except FileNotFoundError:
-    f = open('CalibrationCode\easRV12_15_Nov_2018_21_15_33.log', 'rb')
+    f = open('CalibrationCode\\easRV12_15_Nov_2018_21_15_33.log', 'rb')
 
 
 # Each DAQpack is 24 bytes long
