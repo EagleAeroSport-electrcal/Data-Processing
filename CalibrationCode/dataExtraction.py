@@ -55,7 +55,7 @@ def coefS16(string, points):
 
 
 def coefU(string, points):
-    """Get an unsigned ing from the provided string."""
+    """Get an unsigned int from the provided string."""
     return int(''.join([string[i] for i in points]), 16)
 
 
@@ -85,7 +85,7 @@ for i, value in enumerate(header):
         presCalibrations[sensorID] = {}
 
         # Parse the calibration line to be only the characters that we want
-        calString = (header[i][5].split('||')[1])
+        calString = (header[i][5].split(': ')[1])
 
         # Calculate the temperature calibration values
         presCalibrations[sensorID]['temperature'] = [
@@ -110,21 +110,13 @@ for i, value in enumerate(header):
         # Calculate the humidity calibrations values
         presCalibrations[sensorID]['humidity'] = [
             coefU(calString, [48, 49]),
-            coefS16(calString, [52, 53, 50, 51]),
-            coefU(calString, [54, 55]),
-            # These variables here are weird, because of
-            # how they are set up
-            # (h4 and h5 share some data in registers)
+            coefS16(calString, [54, 55, 52, 53]),
+            coefU(calString, [56, 57]),
 
-            # This way of doing it is copied from
-            # adafruit's library, lines 166 through 173
-            ((coefS8(calString, [56, 57]) << 4) \
-             | (coefU(calString, [58, 59]) & 0x0F)),
+            coefS16(calString, [62, 63, 60, 61]),
+            coefS16(calString, [66, 67, 64, 65]),
 
-            (coefS8(calString, [60, 61]) << 4 \
-             | (coefU(calString, [58, 59]) >> 4 & 0x0F)),
-
-            coefS8(calString, [62, 63])]
+            coefS8(calString, [68, 69])]
 
 # Seperate the Raw data into each packet
 # This seems to cut off the last data section right now
@@ -235,8 +227,14 @@ for i, val in enumerate(splitData):
 # Per sensor type. See eas_daq_pack.h in github repo for more info.
 
 # print(item for item in uCompData if (item['ID'] == 2))
+""""print(presCalibrations)
+print([hex(i) for i in presCalibrations[2]['temperature']])
+print([hex(i) for i in presCalibrations[2]['pressure']])
+print([hex(i) for i in presCalibrations[2]['humidity']])"""
 
 for item in range(0, 20):
+    print(splitData[item])
+    print("\n")
     try:
         if uCompData[item]['ID'] == 2:
             print(uCompData[item])
