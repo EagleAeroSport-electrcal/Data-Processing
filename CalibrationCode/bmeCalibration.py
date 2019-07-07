@@ -19,7 +19,6 @@ individually.
 try:
     import numpy as np
     # TODO add some logging code?
-
     # Predefine some of the constants
     # TODO Double check how necessary this is
     # TODO Finish adding constants (if needed)
