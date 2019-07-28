@@ -1,0 +1,29 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build Docs",
+            "type": "shell",
+            "command": "venv/Scripts/sphinx-build.exe",
+            "args": [
+                "docs",
+                "docs/html"
+            ],
+            "group": "build",
+            "problemMatcher": {
+                "owner": "Sphinx",
+                "fileLocation": "absolute",
+                "pattern": {
+                    "regexp": "(.*):(\\d+):.* (WARNING:) (.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "severity": 3,
+                    "message": 4
+                }
+            }
+
+        }
+    ]
+}
