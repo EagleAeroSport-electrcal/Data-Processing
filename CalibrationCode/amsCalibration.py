@@ -1,12 +1,5 @@
 """Calculate useable temperature and pressure values from the AMS5915."""
 
-# Disable alert about improper case of variable. I prefer camelcase
-# pylint: disable-msg=C0103
-
-# pylint gets confused about indentation, just disable the warning.
-# pylint: disable-msg=C0330
-
-
 # TODO Look into necessary variable types using numpy
 
 
