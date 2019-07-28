@@ -100,5 +100,8 @@ celerybeat-schedule
 #Custom Additions
 Adafruit_Python_BME280-master/
 CalibrationCode/header breakdown example.txt
+!Test Logs/*.log
+
+.pytest_cache
 
 .tags
