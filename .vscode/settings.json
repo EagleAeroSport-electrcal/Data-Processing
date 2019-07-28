@@ -1,5 +1,9 @@
 {
     "python.pythonPath": ".venv\\Scripts\\python.exe",
     "restructuredtext.confPath": "${workspaceFolder}\\docs",
-    "autoDocstring.customTemplatePath": "C:\\Users\\Gabe\\.vscode-docstring\\google-no-typehints.mustache"
+    "autoDocstring.customTemplatePath": "google-no-typehints.mustache",
+    "python.testing.pytestArgs": [],
+    "python.testing.unittestEnabled": false,
+    "python.testing.nosetestsEnabled": false,
+    "python.testing.pytestEnabled": true
 }
