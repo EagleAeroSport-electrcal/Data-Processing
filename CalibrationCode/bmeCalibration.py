@@ -1,112 +1,245 @@
-"""
-This module is used to convert raw values from a BME280.
+"""Convert raw values from a BME280 to SI units.
 
 Each Function is passed the necessary calibration coefficents and a raw
 value, and returns a compensated value.
 individually.
 """
-
-# Disable alert about improper case of variable. I prefer camelcase
-# pylint: disable-msg=C0103
-
-# pylint gets confused about indentation, just disable the warning.
-# pylint: disable-msg=C0330
-
-# diable warning about there being too many variables in a function
-# pylint: disable-msg=R0914
+from typing import Tuple, Union, Optional
+from numpy import int32 as int32_t
+from numpy import int64 as int64_t
+# TODO add some logging code?
+# Predefine some of the constants
+# TODO Double check how necessary this is
+# TODO Finish adding constants (if needed)
 
 
-try:
-    import numpy as np
-    # TODO add some logging code?
-    # Predefine some of the constants
-    # TODO Double check how necessary this is
-    # TODO Finish adding constants (if needed)
+TemperatureCoefsType = Tuple[int, int, int]
+PressureCoefsType = Tuple[int, int, int, int, int, int, int, int, int]
+HumidityCoefsType = Tuple[int, int, int, int, int, int]
+CoefsType = Tuple[TemperatureCoefsType, PressureCoefsType, HumidityCoefsType]
+ValsType = Tuple[int, int, int]
 
-    temperature_min = np.int32(-4000)
-    temperature_max = np.int32(8500)
-    pressure_min = np.int32(3000000)
-    pressure_max = np.int32(11000000)
-    humidity_max = np.int32(100000)
 
-    # Raw Values and calibration coefficents
-    # This part calculats t_fine and the actual temperature value
-    # Based off of line 1014 of the BME280 driver
-    def compensateTemp(uTemp, tCoefs):
-        """Convert raw temperature into a useable values."""
-        t1, t2, t3 = tCoefs
+tempMin: int32_t = int32_t(-4000)
+tempMax: int32_t = int32_t(8500)
+pressureMin: int32_t = int32_t(3000000)
+pressureMax: int32_t = int32_t(11000000)
+humidityMax: int32_t = int32_t(100000)
 
-        global t_fine
-        var1 = np.int32((uTemp / 8) - (t1 * 2))
-        var1 = np.int32((var1 * t2) / 2048)
 
-        var2 = np.int32((uTemp / 16) - (t1))
-        var2 = np.int32((((var2 * var2) / 4096) * (t3)) / 16384)
-        t_fine = np.int32(var1 + var2)
-        temperature = np.int32((t_fine * 5 + 128) / 256)
-        return temperature
+# Raw Values and calibration coefficents
+# This part calculats tFine and the actual temperature value
+# Based off of line 1014 of the BME280 driver
+
+class CompensateBME280:
+    """Perform BME280 compensation using numpy integers. """
+
+    def __init__(self, coefs: CoefsType, uTemp: int, uPres: int, uHumid: int) -> None:
+        """Set up all of the variables."""
+        self.temperature: int
+        self.tFine: int32_t
+        self.temperature, self.tFine = self.compensateTemp(uTemp, coefs[0])
+        self.pressure = self.compensatePres(uPres, coefs[1], self.tFine)
+        self.humidity = self.compensateHumid(uHumid, coefs[2], self.tFine)
+
+    @staticmethod
+    def compensateTemp(uTemp: int, tCoefs: TemperatureCoefsType) -> Tuple[int, int32_t]:
+        """Convert raw temperature into a useable values.
+
+        Args:
+            uTemp: The uncompensated temperature value
+            tCoefs: The calibration coefficents
+
+        Returns:
+            Tuple of the calibrated temperature, and the value of tFine
+
+        """
+        var1: int32_t = int32_t((uTemp / 8) - (tCoefs[0] * 2))
+        var1 = int32_t((var1 * tCoefs[1]) / 2048)
+
+        var2: int32_t = int32_t((uTemp / 16) - (tCoefs[0]))
+        var2 = int32_t((((var2 * var2) / 4096) * (tCoefs[2])) / 16384)
+        tFine = int32_t(var1 + var2)
+        temperature: int32_t = int32_t((tFine * 5 + 128) / 256)
+        return int(temperature), tFine
 
     # This part calculates the actual pressure
-    def compensatePres(uPres, pCoefs):
-        """Convert the raw temperature values into useable units."""
-        p1, p2, p3, p4, p5, p6, p7, p8, p9 = pCoefs
-        var1 = np.int64(t_fine - 128000)
-        var2 = np.int64(var1 * var1 * p6)
-        var2 = np.int64(var2 + (var1 * p5 * 131072))
-        var2 = np.int64(var2 + (p4 * 34359738368))
-        var1 = np.int64((var1 * var1 * p3 / 256) + (var1 * p2 * 4096))
-        var3 = np.int64(1 * 140737488355328)        # TODO DOUBLE CHECK THIS
-        var1 = np.int64((var3 + var1) * (p1 / 8589934592))
+    @staticmethod
+    def compensatePres(uPres: int, pCoefs: PressureCoefsType, tFine: int32_t) -> int:
+        """Convert the raw pressure values into useable units.
+
+        Args:
+            uPres: Tee uncompensated Pressure Values
+            pCoefs: Tuple of pressure compensation coefficents
+            tFine: Fine temperature calculation from compensateTemp
+
+        Returns:
+            Integer of the calculated pressure
+
+        """
+        var1: int64_t = int64_t(tFine - 128000)
+        var2: int64_t = int64_t(var1 * var1 * pCoefs[5])
+        var2 = int64_t(var2 + (var1 * pCoefs[4] * 131072))
+        var2 = int64_t(var2 + (pCoefs[3] * 34359738368))
+        var1 = int64_t((var1 * var1 * pCoefs[2] / 256) + (var1 * pCoefs[1] * 4096))
+        var3: int64_t = int64_t(1 * 140737488355328)
+        var1 = int64_t((var3 + var1) * (pCoefs[0] / 8589934592))
         # Avoids a divide by zero exception for pressure
-        if var1 != 0:
-            var4 = np.int64(1048576 - uPres)
-            # Does this need np.int64 calling?
-            var4 = np.int64((((var4 * 2147483648) - var2) * 3125) / var1)
-            var1 = np.int64((p9) * (var4 / 8192) * (var4 / 8192)) / 33554432
-            var2 = np.int64((p8 * var4) / 524288)
-            var4 = np.int64((var4 + var1 + var2) / 256 + ((p7 * 16)))
-            pressure = np.int32(((var4 / 2) * 100) / 128)
+        if var1:
+            var4: int64_t = int64_t(1048576 - uPres)
+            # FIXME Does this need int64_t calling?
+            var4 = int64_t((((var4 * 2147483648) - var2) * 3125) / var1)
+            var1 = int64_t((pCoefs[8]) * (var4 / 8192) * (var4 / 8192)) / 33554432
+            var2 = int64_t((pCoefs[7] * var4) / 524288)
+            var4 = int64_t((var4 + var1 + var2) / 256 + ((pCoefs[6] * 16)))
+            pressure: int32_t = int32_t(((var4 / 2) * 100) / 128)
 
             # Compensate for risks of exceedig min and max pressure
-            if pressure < pressure_min:
-                pressure = pressure_min
-            elif pressure > pressure_max:
-                pressure = pressure_max
+            if pressure < pressureMin:
+                pressure = pressureMin
+            elif pressure > pressureMax:
+                pressure = pressureMax
         else:
-            pressure = pressure_min
-        return pressure
+            pressure = pressureMin
+        return int(pressure)
 
-# This part compensates the humindity.
-    def compensateHumid(uHUmid, hCoefs):
+    # This part compensates the humindity.
+    @staticmethod
+    def compensateHumid(uHumid: int, hCoefs: HumidityCoefsType, tFine: Union[float, int]) -> int:
+        """Compensates the raw humidity values, making it user readable.
+
+        Args:
+            uHumid: The uncompensated humidity value
+            hCoefs: Tuple with the compensation coefficents
+            tFine: Fine temperature value from compensateTemp
+
+        Returns: Compensated humidity value
+
+        """
+        var1: int32_t = int32_t(tFine - 76800)
+        var2: int32_t = int32_t(uHumid * 16384)
+        var3: int32_t = int32_t(hCoefs[3] * 1048576)
+        var4: int32_t = int32_t(hCoefs[4] * var1)
+        var5: int32_t = int32_t((((var2 - var3) - var4) + 16384) / 32768)
+        var2 = int32_t(var1 * (hCoefs[5] / 32768))
+        var3 = int32_t((var1 * (hCoefs[2] / 2048)))
+        var4 = int32_t((var2 * (var3 + 32768) / 1024) + 2097152)
+        var2 = int32_t(((var4 * (hCoefs[1])) + 8192) / 16384)
+        var3 = int32_t(var5 * var2)
+        var4 = int32_t(((var3 / 32768) * (var3 / 32768)) / 128)
+        var5 = int32_t(var3 - ((var4 * hCoefs[0]) / 16))
+        if var5 < 0:
+            var5 = int32_t(0)
+        elif var5 > 419430400:
+            var5 = int32_t(419430400)
+
+        humidity = int32_t(var5 / 4096)
+        if humidity > humidityMax:
+            humidity = humidityMax
+        return int(humidity)
+
+
+class CompensateBME280Native:
+    """Perform BME280 compensation using python native int and float."""
+
+    def __init__(self, coefs: CoefsType, uTemp: int, uPres: int, uHumid: int) -> None:
+        self.tCoefs: TemperatureCoefsType = coefs[0]
+        self.pCoefs: PressureCoefsType = coefs[1]
+        self.hCoefs: HumidityCoefsType = coefs[2]
+        self.uTemp: int = uTemp
+        self.uPres: int = uPres
+        self.uHumid: int = uHumid
+        self.tFine: int32_t = self.compensateTemp(self.uTemp, self.tCoefs)[1]
+
+    def compensateAll(self, coefs: Optional[CoefsType] = None, uncompVals: Optional[ValsType] = None) -> ValsType:
+        """Calculate all compensation values for the bme 280."""
+        temperature: int
+        tFine: int32_t
+        pressure: int
+        humidity: int
+
+        if coefs is not None and uncompVals is not None:
+            temperature, tFine = self.compensateTemp(uncompVals[0], coefs[0])
+            pressure = self.compensatePres(uncompVals[1], coefs[1], tFine)
+            humidity = self.compensateHumid(uncompVals[2], coefs[2], tFine)
+        else:
+            temperature, tFine = self.compensateTemp(self.uTemp, self.tCoefs)
+            pressure = self.compensatePres(self.uPres, self.pCoefs, tFine)
+            humidity = self.compensateHumid(self.uHumid, self.hCoefs, tFine)
+        return(temperature, pressure, humidity)
+
+    def compensateTemp(self, uTemp: int, tCoefs: TemperatureCoefsType,) -> Tuple[int, Union[int, float]]:
+        """Convert raw temperature into a useable values."""
+        if uTemp is None or tCoefs is None:
+            uTemp = self.uTemp
+            tCoefs = self.tCoefs
+            tFine = self.tFine
+
+        var1: int32_t = (uTemp / 8) - (tCoefs[0] * 2)
+        var1 = (var1 * tCoefs[1]) / 2048
+
+        var2: int32_t = (uTemp / 16) - (tCoefs[0])
+        var2 = (((var2 * var2) / 4096) * (tCoefs[2])) / 16384
+        tFine = var1 + var2
+        temperature: int32_t = (tFine * 5 + 128) / 256
+        return temperature, tFine
+
+    def compensatePres(self, uPres: int, pCoefs: PressureCoefsType, tFine: int32_t) -> int:
+        """Convert the raw pressure values into useable units."""
+        if uPres is None or pCoefs is None:
+            uPres = self.uPres
+            pCoefs = self.pCoefs
+            tFine = self.tFine
+        var1: int64_t = tFine - 128000
+        var2: int64_t = var1 * var1 * pCoefs[5]
+        var2 = var2 + (var1 * pCoefs[4] * 131072)
+        var2 = var2 + (pCoefs[3] * 34359738368)
+        var1 = (var1 * var1 * pCoefs[2] / 256) + (var1 * pCoefs[1] * 4096)
+        var3: int64_t = 1 * 140737488355328
+        var1 = (var3 + var1) * (pCoefs[0] / 8589934592)
+        # Avoids a divide by zero exception for pressure
+        if var1:
+            var4: int64_t = 1048576 - uPres
+            # FIXME Does this need int64_t calling?
+            var4 = (((var4 * 2147483648) - var2) * 3125) / var1
+            var1 = (pCoefs[8]) * (var4 / 8192) * (var4 / 8192) / 33554432
+            var2 = (pCoefs[7] * var4) / 524288
+            var4 = (var4 + var1 + var2) / 256 + ((pCoefs[6] * 16))
+            pressure: int32_t = ((var4 / 2) * 100) / 128
+
+            # Compensate for risks of exceedig min and max pressure
+            if pressure < pressureMin:
+                pressure = pressureMin
+            elif pressure > pressureMax:
+                pressure = pressureMax
+        else:
+            pressure = pressureMin
+        return int(pressure)
+
+    def compensateHumid(self, uHumid: int, hCoefs: HumidityCoefsType, tFine: Union[float, int]) -> int:
         """Compensates the raw humidity values, making it user readable."""
-        h1, h2, h3, h4, h5, h6 = hCoefs
-        var1 = np.int32(t_fine - 76800)
-        var2 = np.int32(uHUmid * 16384)
-        var3 = np.int32(h4 * 1048576)
-        var4 = np.int32(h5 * var1)
-        var5 = np.int32((((var2 - var3) - var4) + 16384) / 32768)
-        var2 = np.int32(var1 * (h6 / 32768))
-        var3 = np.int32((var1 * (h3 / 2048)))
-        var4 = np.int32((var2 * (var3 + 32768) / 1024) + 2097152)
-        var2 = np.int32(((var4 * (h2)) + 8192) / 16384)
-        var3 = np.int32(var5 * var2)
-        var4 = np.int32(((var3 / 32768) * (var3 / 32768)) / 128)
-        var5 = np.int32(var3 - ((var4 * h1) / 16))
+        if uHumid is None or hCoefs is None:
+            uHumid = self.uHumid
+            hCoefs = self.hCoefs
+            tFine = self.tFine
+        var1: int32_t = tFine - 76800
+        var2: int32_t = uHumid * 16384
+        var3: int32_t = hCoefs[3] * 1048576
+        var4: int32_t = hCoefs[4] * var1
+        var5: int32_t = (((var2 - var3) - var4) + 16384) / 32768
+        var2 = var1 * (hCoefs[5] / 32768)
+        var3 = (var1 * (hCoefs[2] / 2048))
+        var4 = (var2 * (var3 + 32768) / 1024) + 2097152
+        var2 = ((var4 * (hCoefs[1])) + 8192) / 16384
+        var3 = var5 * var2
+        var4 = ((var3 / 32768) * (var3 / 32768)) / 128
+        var5 = var3 - ((var4 * hCoefs[0]) / 16)
         if var5 < 0:
             var5 = 0
-        else:
-            var5 = var5
-        if var5 > 419430400:
+        elif var5 > 419430400:
             var5 = 419430400
-        else:
-            var5 = var5
 
-        humidity = np.int32(var5 / 4096)
-        if humidity > humidity_max:
-            humidity = humidity_max
-        return humidity
-
-
-# For future use in logging errors, Currently just raises the error as default
-except ModuleNotFoundError as error:
-    raise
+        humidity = var5 / 4096
+        if humidity > humidityMax:
+            humidity = humidityMax
+        return int(humidity)
