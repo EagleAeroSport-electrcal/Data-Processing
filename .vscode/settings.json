@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": "venv\\Scripts\\python.exe",
+    "python.pythonPath": ".venv\\Scripts\\python.exe",
     "restructuredtext.confPath": "${workspaceFolder}\\docs",
     "autoDocstring.customTemplatePath": "C:\\Users\\Gabe\\.vscode-docstring\\google-no-typehints.mustache"
 }
