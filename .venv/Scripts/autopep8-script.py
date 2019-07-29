@@ -1,4 +1,4 @@
-#!D:\Documents\GitHub\Data-Processing\.venv\Scripts\python.exe
+#!d:\documents\github\data-processing\.venv\scripts\python.exe
 # EASY-INSTALL-ENTRY-SCRIPT: 'autopep8==1.4.4','console_scripts','autopep8'
 __requires__ = 'autopep8==1.4.4'
 import re

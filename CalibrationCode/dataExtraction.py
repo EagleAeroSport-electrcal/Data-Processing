@@ -65,6 +65,7 @@ def openFileNonInteractive(filePath: Union[str, PathLike]) -> Tuple[List[List[st
         The header (split into section for each device), and the raw bytes from the data.
 
     """
+
     with open(filePath, mode='rb') as fileObj:
         data = fileObj.read()
 
