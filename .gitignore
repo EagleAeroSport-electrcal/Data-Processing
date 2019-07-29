@@ -105,3 +105,4 @@ CalibrationCode/header breakdown example.txt
 .pytest_cache
 
 .tags
+cov.xml
