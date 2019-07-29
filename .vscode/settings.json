@@ -4,8 +4,10 @@
     "python.testing.pytestArgs": [
         "tests",
         "-s",
-        "-v"
+        "-v",
+        "--cov=.",
+        "--cov-report=xml:cov.xml",
+        "--cov-branch",
     ],
     "python.testing.pytestEnabled": true,
-
 }
