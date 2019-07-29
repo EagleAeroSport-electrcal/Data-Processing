@@ -217,6 +217,7 @@ def splitSensorData(dataStream: bytes) -> List[bytes]:
 
 
 def processPackets(packets: List[bytes]) -> UCompDataType:
+    # pylint: disable=too-complex, too-many-branches
     """Extract variables from the packets using the struct module.
 
     Args:

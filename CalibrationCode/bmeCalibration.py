@@ -113,7 +113,8 @@ class CompensateBME280:
             hCoefs: Tuple with the compensation coefficents
             tFine: Fine temperature value from compensateTemp
 
-        Returns: Compensated humidity value
+        Returns:
+            Compensated humidity value
 
         """
         var1: uint32_t = uint32_t(tFine - 76800)
