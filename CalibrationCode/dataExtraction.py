@@ -11,7 +11,7 @@ import struct
 from os import PathLike
 from tkinter import Tk
 from tkinter.filedialog import askopenfilename
-from typing import Any, BinaryIO, Dict, Iterable, List, Tuple, Union
+from typing import BinaryIO, Dict, Iterable, List, Tuple, Union
 
 # Type hint aliases
 TempCoefsType = Tuple[int, int, int]
@@ -33,14 +33,7 @@ def openFileInteractive() -> Tuple[List[List[str]], bytes]:
 
     """
     data: bytes
-    f: BinaryIO
-    """
-    try:
-        with open('easRV12_15_Nov_2018_21_15_33.log', 'rb') as f:
-            data = f.read()
-    except FileNotFoundError:
-        with open('CalibrationCode\\easRV12_15_Nov_2018_21_15_33.log', 'rb') as f:
-            data = f.read()"""
+    fileObj: BinaryIO
     Tk().withdraw()
     fileName = askopenfilename(title='Select File to Open', filetypes=(("Log File", '*.log'), ('All File Types', '*')))
     with open(fileName, mode='rb') as fileObj:
@@ -65,7 +58,6 @@ def openFileNonInteractive(filePath: Union[str, PathLike]) -> Tuple[List[List[st
         The header (split into section for each device), and the raw bytes from the data.
 
     """
-
     with open(filePath, mode='rb') as fileObj:
         data = fileObj.read()
 
@@ -206,7 +198,7 @@ def extractPresCalCoefs(header: List[List[str]]) -> BME280CalType:
     return presCalibrations
 
 
-def splitSensorData(dataStream: bytes) -> List[bytes]:        # pylint: disable=too-complex, too-many-branches
+def splitSensorData(dataStream: bytes) -> List[bytes]:
     """Split the data stream apart into all sensors.
 
     Args:
@@ -237,8 +229,8 @@ def processPackets(packets: List[bytes]) -> UCompDataType:
     # Split the information in each packet into the proper type
     uCompData: UCompDataType = []
     names: Tuple[str, ...]
-    for index, value in enumerate(packets):
-        packetType: int = struct.unpack('<xxxxIxxxxxxxxxxxxxxxx', value)[0]
+    for packet in packets:
+        packetType: int = struct.unpack('<xxxxIxxxxxxxxxxxxxxxx', packet)[0]
         if not packetType:
             # this is for packType == 0.
             # Undef, Means something weird happened and we need to check CPP
@@ -250,12 +242,12 @@ def processPackets(packets: List[bytes]) -> UCompDataType:
         elif packetType == 0x02:
             # This is for the Acclerometer. Currently uses signed short 16,
             # so we need to be careful about this one.
-            data = struct.unpack('<IIhhhxxxxxxxxxx', value)
+            data = struct.unpack('<IIhhhxxxxxxxxxx', packet)
             names = ('ID', 'type', 'uAccX', 'uAccY', 'uAccZ')
             uCompData.append(dict(zip(names, data)))
         elif packetType == 0x03:
             # Barotemp type packet. Used with the BMP180
-            data = struct.unpack('<IIIHxxxxxxxxxx', value)
+            data = struct.unpack('<IIIHxxxxxxxxxx', packet)
             names = ('ID', 'type', 'uPres', 'uTemp')
             uCompData.append(dict(zip(names, data)))
         elif packetType == 0x04:
@@ -269,7 +261,7 @@ def processPackets(packets: List[bytes]) -> UCompDataType:
             pass
         elif packetType == 0x07:
             names = ('ID', 'type', 'uAccX', 'uAccY', 'uAccZ', 'uGyroX', 'uGyroY', 'uGyroZ', 'uTemp')
-            data = struct.unpack('<IIhhhhhhhxx', value)
+            data = struct.unpack('<IIhhhhhhhxx', packet)
             uCompData.append(dict(zip(names, data)))
         elif packetType == 0x08:
             # ADXL345_t currently unused in code (commit 182fe0c)
@@ -278,7 +270,7 @@ def processPackets(packets: List[bytes]) -> UCompDataType:
             # BMP180_t currently unused (commit  182fe0c)
             pass
         elif packetType == 0x0a:
-            data = struct.unpack('<IIIIHxxxxxx', value)
+            data = struct.unpack('<IIIIHxxxxxx', packet)
             names = ('ID', 'type', 'uPres', 'uTemp', 'uHumid')
 
             uCompData.append(dict(zip(names, data)))
@@ -289,7 +281,7 @@ def processPackets(packets: List[bytes]) -> UCompDataType:
             # Currently has some issues with the status bit, waiting on Dr. Davis
             # For a solution
 
-            uCompData.append({'ID': value[0],
+            uCompData.append({'ID': packet[0],
                               'type': packetType,
                               # 'status': int.from_bytes(bytesvalue[])
                               # 'uPres': int.
@@ -307,9 +299,8 @@ def processPackets(packets: List[bytes]) -> UCompDataType:
 
 # Run this if the module is run manually.
 if __name__ == '__main__':
-    header, rawDataN = openFileNonInteractive('Test Logs/easRV12_28_Oct_2016_04_39_20.log')
+    _, rawDataN = openFileNonInteractive('Test Logs/easRV12_28_Oct_2016_04_39_20.log')
     splitN = splitSensorData(rawDataN)
-    x = extractPresCalCoefs(header)
     processedPackets = processPackets(splitN)
     for i in processedPackets:
         print(i)

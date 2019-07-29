@@ -14,9 +14,6 @@
     "python.linting.pep8Enabled": true,
     "python.linting.mypyEnabled": true,
     "python.linting.pylintEnabled": true,
-    "python.linting.pylintArgs": [
-        "--rcFile=./.pylintrc",
-        "--enable=all",
-        "--disable=None"
-    ]
+    "python.linting.pylintUseMinimalCheckers": false,
+
 }

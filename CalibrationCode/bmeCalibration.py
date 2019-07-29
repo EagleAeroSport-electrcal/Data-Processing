@@ -65,7 +65,7 @@ class CompensateBME280:
 
     # This part calculates the actual pressure
     @staticmethod
-    def compensatePres(uPres: int, pCoefs: PressureCoefsType, tFine: int32_t) -> int:
+    def compensatePres(uPres: int, pCoefs: PressureCoefsType, tFine: uint32_t) -> int:
         """Convert the raw pressure values into useable units.
 
         Args:
@@ -185,7 +185,7 @@ class CompensateBME280Native:
         temperature: uint32_t = (tFine * 5 + 128) / 256
         return temperature, tFine
 
-    def compensatePres(self, uPres: int, pCoefs: PressureCoefsType, tFine: int32_t) -> int:
+    def compensatePres(self, uPres: int, pCoefs: PressureCoefsType, tFine: uint32_t) -> int:
         """Convert the raw pressure values into useable units."""
         if uPres is None or pCoefs is None:
             uPres = self.uPres
