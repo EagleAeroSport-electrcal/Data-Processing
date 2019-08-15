@@ -21,10 +21,6 @@ BME280CalType = Dict[Union[str, int], Dict[str, Union[TempCoefsType, PresCoefsTy
 UCompDataType = List[Dict[str, Union[int]]]
 
 
-# Nesting in try blocks to see if the code is being run from a system with top
-# level as github repo
-
-
 def openFileInteractive() -> Tuple[List[List[str]], bytes]:
     """Open a tkinter file dialog to prompt the user to select a file, then parse the file.
 

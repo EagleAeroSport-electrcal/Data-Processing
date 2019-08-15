@@ -1,6 +1,8 @@
 """Unit Tests for dataExtraction.py."""
-import CalibrationCode.dataExtraction as dataExtraction
+# pylint: disable=invalid-name
 from pathlib import Path
+
+import CalibrationCode.dataExtraction as dataExtraction
 
 
 def test_fileSplitWorks() -> None:
@@ -17,10 +19,10 @@ def test_fileSplitWorks() -> None:
 
 
 def test_extractPresCalCoefsWorks() -> None:
-    """Test if the pressure calibration extractor function works."""
+    """Test if the pressure calibration coefficent extractor function works."""
     logDir: Path = Path('Test Logs')
     for file in logDir.iterdir():
-        header, _ = dataExtraction.openFileNonInteractive('Test Logs/easRV12_28_Oct_2016_04_39_20.log')
+        header, _ = dataExtraction.openFileNonInteractive(file)
         calCoefs = dataExtraction.extractPresCalCoefs(header)
         assert isinstance(calCoefs, dict)
         for sensor in calCoefs.values():
@@ -44,7 +46,7 @@ def test_splitDataWorks() -> None:
 
 def test_extractPacketDataWorks() -> None:
     """Test if the packet value extractor works."""
-    header, rawDataN = dataExtraction.openFileNonInteractive('Test Logs/easRV12_28_Oct_2016_04_39_20.log')
+    _, rawDataN = dataExtraction.openFileNonInteractive('Test Logs/easRV12_28_Oct_2016_04_39_20.log')
     splitN = dataExtraction.splitSensorData(rawDataN)
     processedPackets = dataExtraction.processPackets(splitN)
     assert isinstance(processedPackets, list)
