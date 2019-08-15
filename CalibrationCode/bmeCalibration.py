@@ -69,7 +69,7 @@ class CompensateBME280:
         """Convert the raw pressure values into useable units.
 
         Args:
-            uPres: Tee uncompensated Pressure Values
+            uPres: The uncompensated Pressure Values
             pCoefs: Tuple of pressure compensation coefficents
             tFine: Fine temperature calculation from compensateTemp
 
