@@ -15,5 +15,8 @@
     "python.linting.mypyEnabled": true,
     "python.linting.pylintEnabled": true,
     "python.linting.pylintUseMinimalCheckers": false,
+    "python.linting.banditArgs": [
+        "--ini setup.cfg"
+    ],
 
 }
