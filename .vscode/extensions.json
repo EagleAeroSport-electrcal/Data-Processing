@@ -7,8 +7,6 @@
 		"ms-python.python",
 		"lextudio.restructuredtext",
         "gruntfuggly.todo-tree",
-        "ryanluker.vscode-coverage-gutters"
-
 	],
 	// List of extensions recommended by VS Code that should not be recommended for users of this workspace.
 	"unwantedRecommendations": [
