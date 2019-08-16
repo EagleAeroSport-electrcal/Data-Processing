@@ -31,7 +31,7 @@ def openFileInteractive() -> Tuple[List[List[str]], bytes]:
     data: bytes
     fileObj: BinaryIO
     Tk().withdraw()
-    fileName = askopenfilename(title='Select File to Open', filetypes=(("Log File", '*.log'), ('All File Types', '*')))
+    fileName = askopenfilename(title='Select File to Open', filetypes=(('Log File', '*.log'), ('All File Types', '*')))
     with open(fileName, mode='rb') as fileObj:
         data = fileObj.read()
 
@@ -142,13 +142,13 @@ def extractPresCalCoefs(header: List[List[str]]) -> BME280CalType:
 
         # This part might not be necessary once we get the beginning of the raw
         # data down cold
-        if "\x00\x00\x00" in value[0]:
+        if '\x00\x00\x00' in value[0]:
             del header[index]
 
-        elif "BME280 Temperature Humidity Pressure Sensor" in value[1]:
+        elif 'BME280 Temperature Humidity Pressure Sensor' in value[1]:
             sensorID: int = int(value[0].split(': ')[1])
             # This part is just for debugging at the moment. It lists BME280s
-            print("Found a pressure sensor at index " + str(index))
+            print('Found a pressure sensor at index ' + str(index))
 
             # Initialize a new entry in the dictionary of calibrations.
             presCalibrations[sensorID] = {}
@@ -163,7 +163,7 @@ def extractPresCalCoefs(header: List[List[str]]) -> BME280CalType:
             presCalibrations[sensorID]['temperature'] = (
                 coefU(calString, [2, 3, 0, 1]),
                 coefS16(calString, [6, 7, 4, 5]),
-                coefS16(calString, [10, 11, 8, 9])
+                coefS16(calString, [10, 11, 8, 9]),
             )
 
             # Calculate the Pressure calibration values
@@ -176,7 +176,7 @@ def extractPresCalCoefs(header: List[List[str]]) -> BME280CalType:
                 coefS16(calString, [34, 35, 32, 33]),
                 coefS16(calString, [38, 39, 36, 37]),
                 coefS16(calString, [42, 43, 40, 41]),
-                coefS16(calString, [46, 47, 44, 45])
+                coefS16(calString, [46, 47, 44, 45]),
             )
 
             # Calculate the humidity calibrations values
@@ -188,7 +188,7 @@ def extractPresCalCoefs(header: List[List[str]]) -> BME280CalType:
                 coefS16(calString, [62, 63, 60, 61]),
                 coefS16(calString, [66, 67, 64, 65]),
 
-                coefS8(calString, [68, 69])
+                coefS8(calString, [68, 69]),
             )
 
     return presCalibrations
