@@ -1,19 +1,32 @@
-# Data-Processing
+# Data Processing
 
 Repository for data processing code for EAS
+
+## Table Of Contents
+
+- [Data Processing](#data-processing)
+  - [Table Of Contents](#table-of-contents)
+  - [Contributing](#contributing)
+    - [Setup](#setup)
+      - [Python Version](#python-version)
+      - [Virtual Environment](#virtual-environment)
+      - [Requirements File](#requirements-file)
+    - [Submissions](#submissions)
+  - [Development Environments](#development-environments)
+
 
 ## Contributing
 
 ### Setup
 
-#### Python Versions
+#### Python Version
 
 Python version 3.6 or newer is **required** due to variable type hints being used.
 Python 3.7 is recommended as that is the version that the program has been tested on.
 
-#### Virtual Enviroment
+#### Virtual Environment
 
-To contribute to this project, it is recommended to set up a python virtual enviroment using [venv](https://docs.python.org/3/library/venv.html).
+To contribute to this project, it is recommended to set up a python virtual environment using [venv](https://docs.python.org/3/library/venv.html).
 Initializate a virtual enviroment with `python -m venv .venv`.\
 When launching a terminal session to use with the project, activate the session using
 
@@ -36,9 +49,9 @@ Prior to filing a pull request, the following steps must be performed:
 * Program does not fail any unit tests.
 * New features has corresponding unit tests
 
-Note that in the near future, all of this will be automatically tested on creation of a Pull Request, and Pull Request acceptance will be dependent on the results. A fail of one or more of the above does not guarentee a rejection of the Pull Request, as false positives do happen. 
+Note that in the near future, all of this will be automatically tested on creation of a Pull Request, and Pull Request acceptance will be dependent on the results. A fail of one or more of the above does not guarentee a rejection of the Pull Request, as false positives do happen.
 
-## Development Enviroments
+## Development Environments
 
 A .vscode folder is pre-configured with the project. It contains all of the settings and build tasks to allow the project to be directly loaded into Visual Studio Code and leverage all of its features.\
 Feel free to add other configuration folders leveraging whatever IDE you choose to use, but make sure that project level settings **only** contain settings related to the project, and not user preferences such as themes and keyboard shortcuts.
