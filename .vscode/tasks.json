@@ -6,12 +6,15 @@
         {
             "label": "Build Docs",
             "type": "shell",
-            "command": "venv/Scripts/sphinx-build.exe",
+            "command": ".venv/Scripts/sphinx-build.exe",
             "args": [
                 "docs",
                 "docs/html"
             ],
-            "group": "build",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
             "problemMatcher": {
                 "owner": "Sphinx",
                 "fileLocation": "absolute",
@@ -23,7 +26,6 @@
                     "message": 4
                 }
             }
-
         }
     ]
 }
