@@ -7,11 +7,12 @@ or graphing).
 """
 # INFO: Each DAQpack is 24 bytes long
 
+import binascii
 import struct
 from os import PathLike
 from tkinter import Tk
 from tkinter.filedialog import askopenfilename
-from typing import BinaryIO, Dict, Iterable, List, Tuple, Union
+from typing import BinaryIO, Dict, List, Tuple, Union
 
 # Type hint aliases
 TempCoefsType = Tuple[int, int, int]
@@ -79,54 +80,6 @@ def splitBytesFile(bytesFile: bytes) -> Tuple[List[List[str]], bytes]:
     return header, rawData
 
 
-def coefU(string: str, locations: Iterable[int]) -> int:
-    """Get an unsigned int from the provided string.
-
-    Args:
-        string: The string to extract the number from
-        locations: The indices in the string that the number exists at
-
-    Returns:
-        Unsigned 16 bit integer
-
-    """
-    return int(''.join([string[element] for element in locations]), 16)
-
-
-def coefS16(string: str, locations: Iterable[int]) -> int:
-    """Get a signed 16-bit value from the provided string.
-
-    Args:
-        string: The string to extract the value from
-        locations: The indices in the string to extract the value from
-
-    Returns:
-        Signed 16 bit integer
-
-    """
-    result = coefU(string, locations)
-    if result > 32767:
-        result -= 65536
-    return result
-
-
-def coefS8(string: str, locations: Iterable[int]) -> int:
-    """Get a signed 8-bit value from the provided string.
-
-    Args:
-        string: The string to get the number from.
-        locations: The indices in the string to extract the value from.
-
-    Returns:
-        Signed 8 bit integer
-
-    """
-    result = coefU(string, locations)
-    if result > 127:
-        result -= 256
-    return result
-
-
 def extractPresCalCoefs(header: List[List[str]]) -> BME280CalType:
     """Calculate the calibration coeffiecents in the header.
 
@@ -160,36 +113,16 @@ def extractPresCalCoefs(header: List[List[str]]) -> BME280CalType:
                 calString = (value[5].split('||')[1])
 
             # Calculate the temperature calibration values
-            presCalibrations[sensorID]['temperature'] = (
-                coefU(calString, [2, 3, 0, 1]),
-                coefS16(calString, [6, 7, 4, 5]),
-                coefS16(calString, [10, 11, 8, 9]),
-            )
+            presCalibrations[sensorID]['temperature'] = struct.unpack(  # type: ignore
+                'Hhh', binascii.unhexlify(calString[0:12]))
 
             # Calculate the Pressure calibration values
-            presCalibrations[sensorID]['pressure'] = (
-                coefU(calString, [14, 15, 12, 13]),
-                coefS16(calString, [18, 19, 16, 17]),
-                coefS16(calString, [22, 23, 20, 21]),
-                coefS16(calString, [26, 27, 24, 25]),
-                coefS16(calString, [31, 30, 28, 29]),
-                coefS16(calString, [34, 35, 32, 33]),
-                coefS16(calString, [38, 39, 36, 37]),
-                coefS16(calString, [42, 43, 40, 41]),
-                coefS16(calString, [46, 47, 44, 45]),
-            )
+            presCalibrations[sensorID]['pressure'] = struct.unpack(  # type: ignore
+                'Hhhhhhhhh', binascii.unhexlify(calString[12:48]))
 
             # Calculate the humidity calibrations values
-            presCalibrations[sensorID]['humidity'] = (
-                coefU(calString, [48, 49]),
-                coefS16(calString, [54, 55, 52, 53]),
-                coefU(calString, [56, 57]),
-
-                coefS16(calString, [62, 63, 60, 61]),
-                coefS16(calString, [66, 67, 64, 65]),
-
-                coefS8(calString, [68, 69]),
-            )
+            presCalibrations[sensorID]['humidity'] = struct.unpack(  # type: ignore
+                'BhBhhb', binascii.unhexlify(calString[48:70]))
 
     return presCalibrations
 
@@ -296,7 +229,8 @@ def processPackets(packets: List[bytes]) -> UCompDataType:
 
 # Run this if the module is run manually.
 if __name__ == '__main__':
-    _, rawDataN = openFileNonInteractive('Test Logs/easRV12_28_Oct_2016_04_39_20.log')
+    header, rawDataN = openFileNonInteractive('Test Logs/easRV12_28_Oct_2016_04_39_20.log')
+    extractPresCalCoefs(header)
     splitN = splitSensorData(rawDataN)
     processedPackets = processPackets(splitN)
     for i in processedPackets:
