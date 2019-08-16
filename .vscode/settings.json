@@ -20,5 +20,6 @@
     "python.linting.banditArgs": [
         "--ini setup.cfg"
     ],
+    "python.linting.flake8Enabled": true,
 
 }
