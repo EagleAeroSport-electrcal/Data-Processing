@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """Convert raw values from a BME280 to SI units.
 
 Each Function is passed the necessary calibration coefficents and a raw

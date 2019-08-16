@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """This is the top level file for the EAS Data extraction module.
 
 It reads the calibration coefficents and the raw data from the EAS Log files,

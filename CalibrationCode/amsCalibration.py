@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """Calculate useable temperature and pressure values from the AMS5915."""
 
 # TODO Look into necessary variable types using numpy
