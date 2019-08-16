@@ -36,7 +36,7 @@ When launching a terminal session to use with the project, activate the session 
 #### Requirements File
 
 All necessary python requirements for the program, as well as linters, are specified in the file `requirements.txt`. To install them all, use the command `python -m pip install -U -r requirements.txt`.\
-Using -U ensures that the correct version will be inststalled, even if a different version is already installed.
+Using `-U` ensures that the correct version will be inststalled, even if a different version is already installed.
 If not necessary, the requirements do not have a specific version set in the file, to allow for automatic installation of the newest version of the program.
 
 ### Submissions
