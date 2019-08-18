@@ -9,7 +9,8 @@
             "command": ".venv/Scripts/sphinx-build.exe",
             "args": [
                 "docs",
-                "docs/html"
+                "docs/html",
+                "-a"
             ],
             "group": {
                 "kind": "build",

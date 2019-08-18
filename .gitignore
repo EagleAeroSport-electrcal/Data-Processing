@@ -109,3 +109,5 @@ cov.xml
 removeDupeReqs.py
 .linuxvenv
 .venv
+
+docs/html

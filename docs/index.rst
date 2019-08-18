@@ -7,8 +7,15 @@ Welcome to EAS Data Processing's documentation!
 ===============================================
 
 .. toctree::
-    
-    Source/modules
+
+.. autosummary::
+   :toctree: _autosummary
+   :template: _autosummary/module.rst
+
+   CalibrationCode.dataExtraction
+   CalibrationCode.bmeCalibration
+   CalibrationCode.amsCalibration
+
 
 
 
