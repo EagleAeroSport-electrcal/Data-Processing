@@ -14,14 +14,12 @@ import struct
 from os import PathLike
 from tkinter import Tk
 from tkinter.filedialog import askopenfilename
-from typing import BinaryIO, Dict, List, Tuple, Union
+from typing import BinaryIO, List, Tuple, Union, Dict
 
-# Type hint aliases
-TempCoefsType = Tuple[int, int, int]
-PresCoefsType = Tuple[int, int, int, int, int, int, int, int, int]
-HumidityCoefsType = Tuple[int, int, int, int, int, int]
-BME280CalType = Dict[Union[str, int], Dict[str, Union[TempCoefsType, PresCoefsType, HumidityCoefsType]]]
-UCompDataType = List[Dict[str, Union[int]]]
+from CalibrationCode.typeAliases import UCompDataType
+from CalibrationCode.customObjs import BME280Coefficents
+
+BME280CalType = Dict[Union[str, int], BME280Coefficents]
 
 
 def openFileInteractive() -> Tuple[List[List[str]], bytes]:
@@ -106,7 +104,6 @@ def extractPresCalCoefs(header: List[List[str]]) -> BME280CalType:
             print('Found a pressure sensor at index ' + str(index))
 
             # Initialize a new entry in the dictionary of calibrations.
-            presCalibrations[sensorID] = {}
 
             # Parse the calibration line to be only the characters that we want
             try:
@@ -115,16 +112,11 @@ def extractPresCalCoefs(header: List[List[str]]) -> BME280CalType:
                 calString = (value[5].split('||')[1])
 
             # Calculate the temperature calibration values
-            presCalibrations[sensorID]['temperature'] = struct.unpack(  # type: ignore
-                'Hhh', binascii.unhexlify(calString[0:12]))
-
-            # Calculate the Pressure calibration values
-            presCalibrations[sensorID]['pressure'] = struct.unpack(  # type: ignore
-                'Hhhhhhhhh', binascii.unhexlify(calString[12:48]))
-
-            # Calculate the humidity calibrations values
-            presCalibrations[sensorID]['humidity'] = struct.unpack(  # type: ignore
-                'BhBhhb', binascii.unhexlify(calString[48:70]))
+            presCalibrations[sensorID] = BME280Coefficents(     # type: ignore
+                temperature=struct.unpack('Hhh', binascii.unhexlify(calString[0:12])),
+                pressure=struct.unpack('Hhhhhhhhh', binascii.unhexlify(calString[12:48])),
+                humidity=struct.unpack('BhBhhb', binascii.unhexlify(calString[48:70])),
+                ID=sensorID)
 
     return presCalibrations
 
@@ -231,9 +223,9 @@ def processPackets(packets: List[bytes]) -> UCompDataType:
 
 # Run this if the module is run manually.
 if __name__ == '__main__':
-    header, rawDataN = openFileNonInteractive('Test Logs/easRV12_28_Oct_2016_04_39_20.log')
-    extractPresCalCoefs(header)
+    headerStr, rawDataN = openFileNonInteractive('Test Logs/easRV12_28_Oct_2016_04_39_20.log')
+    extractPresCalCoefs(headerStr)
     splitN = splitSensorData(rawDataN)
     processedPackets = processPackets(splitN)
     for i in processedPackets:
-        print(i)
+        print(i)    # noqa: T001

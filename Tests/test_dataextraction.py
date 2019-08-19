@@ -26,10 +26,17 @@ def test_extractPresCalCoefsWorks() -> None:
         calCoefs = dataExtraction.extractPresCalCoefs(header)
         assert isinstance(calCoefs, dict)
         for sensor in calCoefs.values():
-            assert set(sensor.keys()) == {'temperature', 'pressure', 'humidity'}
-            for section in sensor.values():
-                for coef in section:
-                    assert isinstance(coef, int)
+            assert sorted(set(sensor._fields)) == sorted({'temperature', 'pressure', 'humidity', 'ID'})
+            assert len(sensor.temperature) == 3
+            for element in sensor.temperature:
+                assert isinstance(element, int)
+            assert len(sensor.pressure) == 9
+            for element in sensor.pressure:
+                assert isinstance(element, int)
+            assert len(sensor.humidity) == 6
+            for element in sensor.pressure:
+                assert isinstance(element, int)
+            assert isinstance(sensor.ID, int)
 
 
 def test_splitDataWorks() -> None:
