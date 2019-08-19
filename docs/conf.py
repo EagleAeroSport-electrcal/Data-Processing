@@ -12,7 +12,7 @@
 #
 import os
 import sys
-sys.path.insert(0, os.path.abspath('../CalibrationCode'))
+sys.path.insert(0, os.path.abspath('..'))
 print(sys.path)
 
 # -- Project information -----------------------------------------------------
@@ -32,7 +32,9 @@ release = '1.0'
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
-    'sphinx.ext.autosummary'
+    'sphinx.ext.napoleon',
+    'sphinx_sitemap',
+    'sphinx_autodoc_typehints',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -41,9 +43,8 @@ templates_path = ['_templates']
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', '_templates']
 
-autosummary_generate = True
 
 # -- Options for HTML output -------------------------------------------------
 
