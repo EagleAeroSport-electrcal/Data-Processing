@@ -29,7 +29,7 @@ class CompensateBME280:
 
     Attributes
         temperature (int): The compensated temperature value.
-        tFine (uint32_t): The fine temperature value, used for compensating pressure and humidity.
+        tFine (int32_t): The fine temperature value, used for compensating pressure and humidity.
         pressure (int): The compensated pressure value.
         humidity (int): The compensated humidity.
 
@@ -38,10 +38,10 @@ class CompensateBME280:
     def __init__(self, coefs: BME280Coefficents, uTemp: int, uPres: int, uHumid: int) -> None:
         """Initialize an object containing compensated values for the BME280."""    # noqa: I101
         self.temperature: int
-        self.tFine: uint32_t
+        self.tFine: int32_t
         self.temperature, self.tFine = self.compensateTemp(uTemp, coefs.temperature)
-        self.pressure = self.compensatePres(uPres, coefs.pressure, self.tFine)
-        self.humidity = self.compensateHumid(uHumid, coefs.humidity, self.tFine)
+        self.pressure: int = self.compensatePres(uPres, coefs.pressure, self.tFine)
+        self.humidity: int = self.compensateHumid(uHumid, coefs.humidity, self.tFine)
 
     @staticmethod
     def compensateTemp(uTemp: int, tCoefs: TempCoefsType) -> Tuple[int, int32_t]:
@@ -76,7 +76,7 @@ class CompensateBME280:
 
     # This part calculates the actual pressure
     @staticmethod
-    def compensatePres(uPres: int, pCoefs: PresCoefsType, tFine: uint32_t) -> int:
+    def compensatePres(uPres: int, pCoefs: PresCoefsType, tFine: int32_t) -> int:
         """Convert the raw pressure values into useable units.
 
         Args:
@@ -179,8 +179,8 @@ class CompensateBME280Native:
         self.temperature: float
         self.tFine: uint32_t
         self.temperature, self.tFine = self.compensateTemp(uTemp, coefs.temperature)
-        self.pressure = self.compensatePres(uPres, coefs.pressure, self.tFine)
-        self.humidity = self.compensateHumid(uHumid, coefs.humidity, self.tFine)
+        self.pressure: float = self.compensatePres(uPres, coefs.pressure, self.tFine)
+        self.humidity: float = self.compensateHumid(uHumid, coefs.humidity, self.tFine)
 
     @staticmethod
     def compensateTemp(uTemp: int, tCoefs: TempCoefsType) -> Tuple[float, float]:

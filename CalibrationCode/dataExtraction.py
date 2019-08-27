@@ -227,5 +227,4 @@ if __name__ == '__main__':
     extractPresCalCoefs(headerStr)
     splitN = splitSensorData(rawDataN)
     processedPackets = processPackets(splitN)
-    for i in processedPackets:
-        print(i)    # noqa: T001
+    print(len(processPackets))

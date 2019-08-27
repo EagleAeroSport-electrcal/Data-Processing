@@ -2,7 +2,8 @@
 # pylint: disable=invalid-name
 from pathlib import Path
 
-import CalibrationCode.dataExtraction as dataExtraction
+from CalibrationCode import dataExtraction
+from dataclasses import astuple
 
 
 def test_fileSplitWorks() -> None:
@@ -26,7 +27,8 @@ def test_extractPresCalCoefsWorks() -> None:
         calCoefs = dataExtraction.extractPresCalCoefs(header)
         assert isinstance(calCoefs, dict)
         for sensor in calCoefs.values():
-            assert sorted(set(sensor._fields)) == sorted({'temperature', 'pressure', 'humidity', 'ID'})
+            assert sorted((i for i in dir(sensor) if not i.startswith('_'))) == sorted(
+                ('temperature', 'pressure', 'humidity', 'ID'))
             assert len(sensor.temperature) == 3
             for element in sensor.temperature:
                 assert isinstance(element, int)
