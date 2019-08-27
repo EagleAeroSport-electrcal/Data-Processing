@@ -20,7 +20,7 @@ Repository for data processing code for EAS
 
 #### Python Version
 
-Python version 3.6 or newer is **required** due to variable type hints being used.
+Python version 3.7 or newer is **required** due to the use of dataclasses.
 Python 3.7 is recommended as that is the version that the program has been tested on.
 
 #### Virtual Environment
@@ -48,6 +48,7 @@ Prior to filing a pull request, the following steps must be performed:
 - Program does not fail `flake8` with all plugins specified in `requirements.txt` installed
 - Program does not fail any unit tests.
 - New features has corresponding unit tests
+- Document all linter ignore statements.
 
 Note that in the near future, all of this will be automatically tested on creation of a Pull Request, and Pull Request acceptance will be dependent on the results. A fail of one or more of the above does not guarentee a rejection of the Pull Request, as false positives do happen.
 
