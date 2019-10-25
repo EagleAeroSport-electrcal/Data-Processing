@@ -22,24 +22,30 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
     - name: Lint with flake8
+      continue-on-error: true
       run: |
         flake8
-      continue-on-error: true
     - name: Docstring Tests
+      continue-on-error: true
       run: |
         pydocstyle
-        continue-on-error: true
     - name: Code Style
+      continue-on-error: true
       run: |
         pycodestyle
     - name: Pylint
+      continue-on-error: true
       run: |
         pylint
     - name: Security Analysis
-      run: bandit --ini setup.cfg
+      continue-on-error: true
+      run: |
+        bandit --ini setup.cfg
     - name: MyPy Type Analysis
+      continue-on-error: true
       run: |
         mypy
     - name: PyTest unit tests
+      continue-on-error: true
       run: |
         pytest tests -s -v --cov=./CalibrationCode --cov=./tests --cov-report=term --cov-branch
