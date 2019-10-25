@@ -1,0 +1,42 @@
+name: Python application
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: [3.7, 3.8]
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{matrix.python}}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    - name: Lint with flake8
+      run: |
+        flake8
+    - name: Docstring Tests
+      run: |
+        pydocstyle
+    - name: Code Style
+      run: |
+        pycodestyle
+    - name: Pylint
+      run: |
+        pylint
+    - name: Security Analysis
+      run: bandit --ini setup.cfg
+    - name: MyPy Type Analysis
+      run: |
+        mypy
+    - name: PyTest unit tests
+      run: |
+        pytest tests -s -v --cov=./CalibrationCode --cov=./tests --cov-report=term --cov-branch
