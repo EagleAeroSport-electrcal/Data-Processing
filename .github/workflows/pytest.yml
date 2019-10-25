@@ -24,9 +24,11 @@ jobs:
     - name: Lint with flake8
       run: |
         flake8
+      continue-on-error: true
     - name: Docstring Tests
       run: |
         pydocstyle
+        continue-on-error: true
     - name: Code Style
       run: |
         pycodestyle
