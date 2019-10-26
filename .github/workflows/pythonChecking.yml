@@ -87,7 +87,7 @@ jobs:
         pip install -r requirements.txt
     - name: Pylint
       run: |
-        pylint
+        pylint tests CalibrationCode
 
   bandit:
     runs-on: ubuntu-latest
@@ -108,7 +108,7 @@ jobs:
         pip install -r requirements.txt
     - name: Security Analysis
       run: |
-        bandit --ini setup.cfg
+        bandit -r . --ini setup.cfg
 
   mypy:
     runs-on: ubuntu-latest
@@ -129,7 +129,7 @@ jobs:
         pip install -r requirements.txt
     - name: Static Type Analysis
       run: |
-        mypy
+        mypy .
 
   pytest:
     runs-on: ubuntu-latest
