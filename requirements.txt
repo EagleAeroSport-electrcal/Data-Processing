@@ -38,7 +38,7 @@ pycodestyle
 pydocstyle
 pyflakes
 pylint
-pytest==5.0.1
+pytest
 pytest-cov
 sphinx-rtd-theme
 sphinx-autodoc-typehints
