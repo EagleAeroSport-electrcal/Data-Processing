@@ -227,4 +227,4 @@ if __name__ == '__main__':
     extractPresCalCoefs(headerStr)
     splitN = splitSensorData(rawDataN)
     processedPackets = processPackets(splitN)
-    print(len(processPackets))
+    print(len(processedPackets))

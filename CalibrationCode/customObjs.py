@@ -65,3 +65,11 @@ class _BME280HumidityCoefficents():
     H4: int
     H5: int
     H6: int
+
+    def toInt32(self):
+        self.H1 = int32(self.H1)    # pylint: disable=invalid-name
+        self.H2 = int32(self.H2)    # pylint: disable=invalid-name
+        self.H3 = int32(self.H3)    # pylint: disable=invalid-name
+        self.H4 = int32(self.H4)    # pylint: disable=invalid-name
+        self.H5 = int32(self.H5)    # pylint: disable=invalid-name
+        self.H6 = int32(self.H6)    # pylint: disable=invalid-name
